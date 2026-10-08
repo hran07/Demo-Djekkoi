@@ -92,3 +92,36 @@ src/
 ## 6. General Guidelines for AI
 
 - Jaga kode tetap bersih, modular, dan ramah TypeScript (type-safe).
+
+## 7. Coding Standards & Naming Conventions
+
+### A. Naming Conventions
+
+- **Files & Components:** Gunakan `PascalCase` untuk React Components (Contoh: `CardKolam.tsx`, `ModalForm.tsx`).
+- **Screen Files (Expo Router):** Gunakan `kebab-case` atau huruf kecil (Contoh: `index.tsx`, `kolam.tsx`, `ikan.tsx`).
+- **Variables & Functions:** Gunakan `camelCase` (Contoh: `totalIkan`, `handleDeleteKolam`).
+- **Types & Interfaces:** Gunakan `PascalCase` tanpa prefix `I` (Contoh: `Kolam`, `Ikan`, bukan `IKolam`).
+- **Constants:** Gunakan `UPPER_SNAKE_CASE` (Contoh: `MAX_KAPASITAS`).
+
+### B. Styling & Design System Standards
+
+- **Styling Method:** Gunakan `StyleSheet.create({...})` bawaan React Native secara konsisten.
+- **Color Palette (Wajib ambil dari `src/constants/theme.ts`):**
+  - Primary (Tema Air): `#0284C7` (Sky Blue)
+  - Secondary: `#0F172A` (Slate Dark)
+  - Background: `#F8FAFC` (Off White)
+  - Card/Surface: `#FFFFFF` (Pure White)
+  - Status Success (Sehat/Aktif): `#22C55E`
+  - Status Warning (Perawatan/Karantina): `#F59E0B`
+  - Status Danger (Sakit/Kosong): `#EF4444`
+- **Spacing Standard:** Gunakan kelipatan 4 atau 8 (`padding: 8`, `16`, `24` / `gap: 12`).
+- **Border Radius:** Gunakan `borderRadius: 12` untuk Card dan Modal.
+
+## 8. Workflow & Git Collaboration Guidelines
+
+1. **Pengerjaan Paralel via Contract-First:**
+   - Orang 1 (Data & Types) WAJIB menyelesaikan `src/types/index.ts` dan `src/data/mockData.ts` paling awal agar struktur data disepakati bersama.
+   - Orang 2 (Components & Constants) fokus buat UI reusable berdasarkan tema di `theme.ts`.
+   - Orang 3 (Tabs/Screens) merakit layar menggunakan `mockData` dan `Components` yang ada.
+2. **Penyelarasan AI Prompting:**
+   - Semua tim wajib mencantumkan acuan ke file ini saat menggunakan AI Antigravity agar output kodenya homogen.
