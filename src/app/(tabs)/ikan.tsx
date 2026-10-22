@@ -1,13 +1,14 @@
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import {
-    Alert,
-    FlatList,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    View,
+  Alert,
+  FlatList,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 
 import CardIkan from "../../components/CardIkan";
@@ -19,7 +20,9 @@ import { Ikan, KondisiIkan } from "../../types";
 const SEMUA = "semua";
 
 export default function IkanScreen() {
-  const { kolam, ikan, addIkan, updateIkan, deleteIkan } = useData();
+  const router = useRouter();
+  const { kolam, ikan, riwayatVarietas, addIkan, updateIkan, deleteIkan } =
+    useData();
   const [filterKolamId, setFilterKolamId] = useState<string>(SEMUA);
   const [modalVisible, setModalVisible] = useState(false);
   const [editingIkan, setEditingIkan] = useState<Ikan | null>(null);
@@ -55,6 +58,7 @@ export default function IkanScreen() {
         label: "Varietas",
         type: "text",
         placeholder: "Contoh: Kohaku, Showa",
+        suggestions: riwayatVarietas,
       },
       {
         key: "ukuranCm",
@@ -79,7 +83,7 @@ export default function IkanScreen() {
         ],
       },
     ],
-    [kolam],
+    [kolam, riwayatVarietas],
   );
 
   const initialValues = useMemo<FormValues | undefined>(() => {
@@ -113,6 +117,10 @@ export default function IkanScreen() {
   const handleOpenEdit = (item: Ikan) => {
     setEditingIkan(item);
     setModalVisible(true);
+  };
+
+  const handleOpenDetail = (item: Ikan) => {
+    router.push({ pathname: "/ikan/[id]", params: { id: item.id } });
   };
 
   const handleClose = () => {
@@ -187,6 +195,7 @@ export default function IkanScreen() {
             namaKolam={namaKolamById[item.kolamId] ?? "-"}
             onEdit={handleOpenEdit}
             onDelete={handleDeleteIkan}
+            onPress={handleOpenDetail}
           />
         )}
         ListEmptyComponent={

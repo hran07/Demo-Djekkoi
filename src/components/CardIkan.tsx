@@ -2,10 +2,10 @@ import { Ionicons } from "@expo/vector-icons";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import {
-    COLORS,
-    KONDISI_IKAN_COLOR,
-    RADIUS,
-    SPACING,
+  COLORS,
+  KONDISI_IKAN_COLOR,
+  RADIUS,
+  SPACING,
 } from "../constants/theme";
 import { Ikan } from "../types";
 

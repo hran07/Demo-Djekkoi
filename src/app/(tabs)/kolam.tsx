@@ -1,12 +1,13 @@
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import {
-    Alert,
-    FlatList,
-    Pressable,
-    StyleSheet,
-    Text,
-    View,
+  Alert,
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 
 import CardKolam from "../../components/CardKolam";
@@ -47,6 +48,7 @@ const FORM_FIELDS: FormField[] = [
 ];
 
 export default function KolamScreen() {
+  const router = useRouter();
   const { kolam, addKolam, updateKolam, deleteKolam } = useData();
   const [modalVisible, setModalVisible] = useState(false);
   const [editingKolam, setEditingKolam] = useState<Kolam | null>(null);
@@ -72,6 +74,10 @@ export default function KolamScreen() {
   const handleOpenEdit = (item: Kolam) => {
     setEditingKolam(item);
     setModalVisible(true);
+  };
+
+  const handleOpenDetail = (item: Kolam) => {
+    router.push({ pathname: "/kolam/[id]", params: { id: item.id } });
   };
 
   const handleClose = () => {
@@ -118,6 +124,7 @@ export default function KolamScreen() {
             kolam={item}
             onEdit={handleOpenEdit}
             onDelete={handleDeleteKolam}
+            onPress={handleOpenDetail}
           />
         )}
         ListEmptyComponent={

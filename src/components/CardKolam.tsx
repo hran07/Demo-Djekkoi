@@ -2,10 +2,10 @@ import { Ionicons } from "@expo/vector-icons";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import {
-    COLORS,
-    RADIUS,
-    SPACING,
-    STATUS_KOLAM_COLOR,
+  COLORS,
+  RADIUS,
+  SPACING,
+  STATUS_KOLAM_COLOR,
 } from "../constants/theme";
 import { Kolam } from "../types";
 
