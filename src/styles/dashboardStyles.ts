@@ -1,3 +1,5 @@
+
+
 import { StyleSheet } from "react-native";
 
 import { COLORS, RADIUS, SPACING } from "../constants/theme";
@@ -16,7 +18,7 @@ export const dashboardStyles = StyleSheet.create({
     fontWeight: "700",
     color: COLORS.secondary,
     marginTop: SPACING.sm,
-  },
+  },  
   row: {
     flexDirection: "row",
     gap: SPACING.gap,

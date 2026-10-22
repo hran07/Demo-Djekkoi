@@ -17,4 +17,4 @@ export interface Ikan {
     ukuranCm: number;
     jumlah: number;
     kondisi: KondisiIkan;
-}
+}//type

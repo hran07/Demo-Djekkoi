@@ -29,6 +29,13 @@ export const MOCK_KOLAM: Kolam[] = [
         kapasitas: 6000,
         status: "Kosong",
     },
+    {
+        id: "k5",
+        nama: "Kolam depan",
+        jenis: "Sawah",
+        kapasitas: 20000,
+        status: "Aktif",
+    },
 ];
 
 export const MOCK_IKAN: Ikan[] = [
@@ -80,4 +87,12 @@ export const MOCK_IKAN: Ikan[] = [
         jumlah: 2,
         kondisi: "Sakit",
     },
-];
+    {
+        id: "i7",
+        kolamId: "k5",
+        varietas: "tanco doit",
+        ukuranCm: 35,
+        jumlah: 45,
+        kondisi: "Sehat",
+    },
+];//array

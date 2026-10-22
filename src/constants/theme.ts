@@ -1,8 +1,8 @@
 export const COLORS = {
-    primary: "#0284C7", // Sky Blue (tema air)
+    primary: "#0d00fcff", // Sky Blue (tema air)
     secondary: "#0F172A", // Slate Dark
-    background: "#F8FAFC", // Off White
-    surface: "#FFFFFF", // Card / Modal
+    background: "#009ff4ff", // background apk
+    surface: "#09ff00ff", // Card / Modal
     success: "#22C55E", // Sehat / Aktif
     warning: "#F59E0B", // Perawatan / Karantina
     danger: "#EF4444", // Sakit / Kosong
@@ -11,15 +11,15 @@ export const COLORS = {
 } as const;
 
 export const SPACING = {
-    xs: 4,
-    sm: 8,
-    md: 16,
-    lg: 24,
-    gap: 12,
+    xs: 4, // spacing antar text ke bawah dalam card
+    sm: 8, // jarak ikon
+    md: 16, // ukuran card
+    lg: 24, // posisi tombol tambah
+    gap: 12, // jarak antar card
 } as const;
 
 export const RADIUS = {
-    card: 12,
+    card: 11,
     modal: 12,
 } as const;
 

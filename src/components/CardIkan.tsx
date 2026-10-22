@@ -45,6 +45,7 @@ export default function CardIkan({
         <Text style={styles.label}>Jumlah</Text>
         <Text style={styles.value}>{ikan.jumlah} ekor</Text>
       </View>
+      
 
       <View style={styles.actions}>
         <Pressable style={styles.actionButton} onPress={() => onEdit(ikan)}>
