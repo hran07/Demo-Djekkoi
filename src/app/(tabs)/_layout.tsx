@@ -23,7 +23,7 @@ export default function TabLayout() {
         options={{
           title: "Dashboard",
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="grid-outline" size={size} color={color} />
+            <Ionicons name="grid-outline" size={size} color={color as string} />
           ),
         }}
       />
@@ -32,7 +32,11 @@ export default function TabLayout() {
         options={{
           title: "Kolam",
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="water-outline" size={size} color={color} />
+            <Ionicons
+              name="water-outline"
+              size={size}
+              color={color as string}
+            />
           ),
         }}
       />
@@ -41,7 +45,7 @@ export default function TabLayout() {
         options={{
           title: "Ikan",
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="fish-outline" size={size} color={color} />
+            <Ionicons name="fish-outline" size={size} color={color as string} />
           ),
         }}
       />

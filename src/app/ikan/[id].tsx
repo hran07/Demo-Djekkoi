@@ -20,7 +20,6 @@ import { useData } from "../../context/DataContext";
 import { useSafeBack } from "../../hooks/useSafeBack";
 
 export default function DetailIkanScreen() {
-  // Nilai [id] dari nama file, contoh: /ikan/i1 -> id = "i1"
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const goBack = useSafeBack();
@@ -57,7 +56,7 @@ export default function DetailIkanScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      {/* Judul header mengikuti varietas ikan yang sedang dibuka */}
+      {}
       <Stack.Screen options={{ title: item.varietas }} />
 
       <View style={styles.card}>

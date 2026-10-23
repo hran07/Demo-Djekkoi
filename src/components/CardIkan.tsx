@@ -14,6 +14,7 @@ interface CardIkanProps {
   namaKolam: string;
   onEdit: (ikan: Ikan) => void;
   onDelete: (id: string) => void;
+  onPress?: (item: Ikan) => void;
 }
 
 export default function CardIkan({
@@ -21,11 +22,12 @@ export default function CardIkan({
   namaKolam,
   onEdit,
   onDelete,
+  onPress,
 }: CardIkanProps) {
   const kondisiColor = KONDISI_IKAN_COLOR[ikan.kondisi];
 
   return (
-    <View style={styles.card}>
+    <Pressable style={styles.card} onPress={() => onPress?.(ikan)}>
       <View style={styles.header}>
         <Text style={styles.varietas}>{ikan.varietas}</Text>
         <View style={[styles.badge, { backgroundColor: kondisiColor }]}>
@@ -45,7 +47,6 @@ export default function CardIkan({
         <Text style={styles.label}>Jumlah</Text>
         <Text style={styles.value}>{ikan.jumlah} ekor</Text>
       </View>
-      
 
       <View style={styles.actions}>
         <Pressable style={styles.actionButton} onPress={() => onEdit(ikan)}>
@@ -64,7 +65,7 @@ export default function CardIkan({
           </Text>
         </Pressable>
       </View>
-    </View>
+    </Pressable>
   );
 }
 

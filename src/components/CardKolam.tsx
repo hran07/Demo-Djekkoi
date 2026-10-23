@@ -13,13 +13,19 @@ interface CardKolamProps {
   kolam: Kolam;
   onEdit: (kolam: Kolam) => void;
   onDelete: (id: string) => void;
+  onPress?: (item: Kolam) => void;
 }
 
-export default function CardKolam({ kolam, onEdit, onDelete }: CardKolamProps) {
+export default function CardKolam({
+  kolam,
+  onEdit,
+  onDelete,
+  onPress,
+}: CardKolamProps) {
   const statusColor = STATUS_KOLAM_COLOR[kolam.status];
 
   return (
-    <View style={styles.card}>
+    <Pressable style={styles.card} onPress={() => onPress?.(kolam)}>
       <View style={styles.header}>
         <Text style={styles.nama}>{kolam.nama}</Text>
         <View style={[styles.badge, { backgroundColor: statusColor }]}>
@@ -55,7 +61,7 @@ export default function CardKolam({ kolam, onEdit, onDelete }: CardKolamProps) {
           </Text>
         </Pressable>
       </View>
-    </View>
+    </Pressable>
   );
 }
 

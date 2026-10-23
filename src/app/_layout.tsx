@@ -16,7 +16,7 @@ export default function RootLayout() {
           headerBackTitle: "Kembali",
         }}
       >
-        {/* Tabs punya header sendiri, jadi header Stack disembunyikan */}
+        {}
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="kolam/[id]" options={{ title: "Detail Kolam" }} />
         <Stack.Screen name="ikan/[id]" options={{ title: "Detail Ikan" }} />

@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { ComponentProps, useMemo } from "react";
 import { ScrollView, Text, View } from "react-native";
 
@@ -49,6 +50,7 @@ const KONDISI_LIST: { kondisi: KondisiIkan; icon: IconName }[] = [
 
 export default function DashboardScreen() {
   const { kolam, ikan } = useData();
+  const router = useRouter();
 
   const totalIkan = useMemo(() => hitungJumlahIkan(ikan), [ikan]);
 

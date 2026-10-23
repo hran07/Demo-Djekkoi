@@ -23,7 +23,7 @@ export interface FormField {
   label: string;
   type: "text" | "number" | "select";
   placeholder?: string;
-  options?: SelectOption[]; // wajib untuk type 'select'
+  options?: SelectOption[];
 }
 
 export type FormValues = Record<string, string>;
@@ -54,7 +54,6 @@ export default function ModalForm({
 }: ModalFormProps) {
   const [values, setValues] = useState<FormValues>(buildEmptyValues(fields));
 
-  // Reset isi form setiap modal dibuka (kosong untuk tambah, terisi untuk edit)
   useEffect(() => {
     if (visible) {
       setValues({ ...buildEmptyValues(fields), ...initialValues });

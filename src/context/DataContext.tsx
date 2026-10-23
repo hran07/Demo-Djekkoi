@@ -9,7 +9,6 @@ type IkanInput = Omit<Ikan, "id">;
 interface DataContextValue {
   kolam: Kolam[];
   ikan: Ikan[];
-  /** Daftar varietas yang pernah diinput (dipakai untuk suggestion di form) */
   riwayatVarietas: string[];
   addKolam: (input: KolamInput) => void;
   updateKolam: (id: string, input: KolamInput) => void;
@@ -27,7 +26,6 @@ const generateId = (prefix: string) =>
 const samaVarietas = (a: string, b: string) =>
   a.trim().toLowerCase() === b.trim().toLowerCase();
 
-// Ambil varietas unik (tidak peduli huruf besar/kecil) dari daftar ikan
 function ambilVarietasUnik(daftar: Ikan[]): string[] {
   const hasil: string[] = [];
   for (const item of daftar) {
@@ -45,8 +43,6 @@ export function DataProvider({ children }: { children: ReactNode }) {
     ambilVarietasUnik(MOCK_IKAN),
   );
 
-  // Catat varietas ke riwayat. Jika sudah pernah ada (beda huruf besar/kecil),
-  // pakai penulisan yang sudah tersimpan supaya data tetap konsisten.
   const catatVarietas = (nama: string): string => {
     const sudahAda = riwayatVarietas.find((v) => samaVarietas(v, nama));
     if (sudahAda) return sudahAda;
@@ -65,7 +61,6 @@ export function DataProvider({ children }: { children: ReactNode }) {
         setKolam((prev) =>
           prev.map((item) => (item.id === id ? { id, ...input } : item)),
         ),
-      // Menghapus kolam ikut menghapus ikan di dalamnya agar tidak ada data yatim
       deleteKolam: (id) => {
         setKolam((prev) => prev.filter((item) => item.id !== id));
         setIkan((prev) => prev.filter((item) => item.kolamId !== id));

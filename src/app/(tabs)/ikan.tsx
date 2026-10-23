@@ -27,7 +27,6 @@ export default function IkanScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [editingIkan, setEditingIkan] = useState<Ikan | null>(null);
 
-  // Jika kolam yang difilter sudah dihapus, otomatis kembali ke "Semua"
   const activeFilter = kolam.some((item) => item.id === filterKolamId)
     ? filterKolamId
     : SEMUA;
@@ -96,7 +95,6 @@ export default function IkanScreen() {
         kondisi: editingIkan.kondisi,
       };
     }
-    // Mode tambah: pra-pilih kolam sesuai filter yang sedang aktif
     if (activeFilter === SEMUA) return undefined;
     const prefilled: FormValues = { kolamId: activeFilter };
     return prefilled;
