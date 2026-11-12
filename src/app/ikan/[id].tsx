@@ -1,5 +1,6 @@
-import { Ionicons } from "@expo/vector-icons";
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { Ionicons } from '@expo/vector-icons';
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import React from 'react';
 import {
   Alert,
   Pressable,
@@ -7,17 +8,17 @@ import {
   StyleSheet,
   Text,
   View,
-} from "react-native";
-
-import InfoRow from "../../components/InfoRow";
+} from 'react-native';
+import InfoRow from '../../components/InfoRow';
 import {
   COLORS,
-  KONDISI_IKAN_COLOR,
+  FONTS,
+  KONDISI_IKAN_STYLE,
   RADIUS,
   SPACING,
-} from "../../constants/theme";
-import { useData } from "../../context/DataContext";
-import { useSafeBack } from "../../hooks/useSafeBack";
+} from '../../constants/theme';
+import { useData } from '../../context/DataContext';
+import { useSafeBack } from '../../hooks/useSafeBack';
 
 export default function DetailIkanScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -31,7 +32,7 @@ export default function DetailIkanScreen() {
   if (!item) {
     return (
       <View style={styles.empty}>
-        <Ionicons name="fish-outline" size={48} color={COLORS.textMuted} />
+        <Ionicons name="fish-outline" size={48} color={COLORS.muted} />
         <Text style={styles.emptyText}>Data ikan tidak ditemukan.</Text>
         <Pressable style={styles.secondaryButton} onPress={goBack}>
           <Text style={styles.secondaryText}>Kembali</Text>
@@ -41,40 +42,43 @@ export default function DetailIkanScreen() {
   }
 
   const handleDelete = () => {
-    Alert.alert("Hapus Ikan", `Hapus data ${item.varietas}?`, [
-      { text: "Batal", style: "cancel" },
-      {
-        text: "Hapus",
-        style: "destructive",
-        onPress: () => {
-          deleteIkan(item.id);
-          goBack();
+    Alert.alert(
+      'Hapus Ikan',
+      `Hapus data ikan ${item.varietas}?`,
+      [
+        { text: 'Batal', style: 'cancel' },
+        {
+          text: 'Hapus',
+          style: 'destructive',
+          onPress: () => {
+            deleteIkan(item.id);
+            goBack();
+          },
         },
-      },
-    ]);
+      ],
+      { cancelable: true }
+    );
   };
+
+  const kondisiStyle = KONDISI_IKAN_STYLE[item.kondisi] || KONDISI_IKAN_STYLE.Sehat;
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      {}
       <Stack.Screen options={{ title: item.varietas }} />
 
       <View style={styles.card}>
         <View style={styles.header}>
           <Text style={styles.title}>{item.varietas}</Text>
-          <View
-            style={[
-              styles.badge,
-              { backgroundColor: KONDISI_IKAN_COLOR[item.kondisi] },
-            ]}
-          >
-            <Text style={styles.badgeText}>{item.kondisi}</Text>
+          <View style={[styles.badge, { backgroundColor: kondisiStyle.bg }]}>
+            <Text style={[styles.badgeText, { color: kondisiStyle.text }]}>
+              {item.kondisi}
+            </Text>
           </View>
         </View>
 
-        <InfoRow label="Kolam" value={kolamIkan?.nama ?? "-"} />
-        <InfoRow label="Ukuran" value={`${item.ukuranCm} cm`} />
-        <InfoRow label="Jumlah" value={`${item.jumlah} ekor`} />
+        <InfoRow label="Lokasi Kolam" value={kolamIkan?.nama ?? 'Belum ditentukan'} />
+        <InfoRow label="Ukuran Rata-rata" value={`${item.ukuranCm} cm`} />
+        <InfoRow label="Jumlah Populasi" value={`${item.jumlah} ekor`} />
       </View>
 
       {kolamIkan && (
@@ -82,19 +86,19 @@ export default function DetailIkanScreen() {
           style={styles.primaryButton}
           onPress={() =>
             router.push({
-              pathname: "/kolam/[id]",
+              pathname: '/kolam/[id]',
               params: { id: kolamIkan.id },
             })
           }
         >
-          <Ionicons name="water-outline" size={20} color={COLORS.surface} />
+          <Ionicons name="water-outline" size={20} color="#FFFFFF" />
           <Text style={styles.primaryText}>Lihat {kolamIkan.nama}</Text>
         </Pressable>
       )}
 
       <Pressable style={styles.dangerButton} onPress={handleDelete}>
         <Ionicons name="trash-outline" size={20} color={COLORS.danger} />
-        <Text style={styles.dangerText}>Hapus Ikan</Text>
+        <Text style={styles.dangerText}>Hapus Data Ikan</Text>
       </Pressable>
     </ScrollView>
   );
@@ -103,79 +107,84 @@ export default function DetailIkanScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg,
   },
   content: {
     padding: SPACING.md,
     gap: SPACING.gap,
+    paddingBottom: 40,
   },
   card: {
     backgroundColor: COLORS.surface,
-    borderRadius: RADIUS.card,
-    padding: SPACING.md,
+    borderRadius: 16,
+    padding: 18,
     borderWidth: 1,
     borderColor: COLORS.border,
   },
   header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: SPACING.sm,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: SPACING.md,
   },
   title: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: COLORS.secondary,
+    fontFamily: FONTS.serif,
+    fontSize: 22,
+    fontWeight: '700',
+    color: COLORS.ink,
   },
   badge: {
-    paddingHorizontal: SPACING.gap,
-    paddingVertical: SPACING.xs,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
     borderRadius: 999,
   },
   badgeText: {
-    color: COLORS.surface,
+    fontFamily: FONTS.sans,
     fontSize: 12,
-    fontWeight: "600",
+    fontWeight: '600',
   },
   primaryButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     gap: SPACING.sm,
-    paddingVertical: SPACING.gap,
-    borderRadius: RADIUS.card,
-    backgroundColor: COLORS.primary,
+    height: 50,
+    borderRadius: 14,
+    backgroundColor: COLORS.accent,
   },
   primaryText: {
-    color: COLORS.surface,
-    fontWeight: "600",
-    fontSize: 16,
+    fontFamily: FONTS.sans,
+    color: '#FFFFFF',
+    fontWeight: '700',
+    fontSize: 15,
   },
   dangerButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     gap: SPACING.sm,
-    paddingVertical: SPACING.gap,
-    borderRadius: RADIUS.card,
-    borderWidth: 1,
+    height: 50,
+    borderRadius: 14,
+    borderWidth: 1.5,
     borderColor: COLORS.danger,
     backgroundColor: COLORS.surface,
   },
   dangerText: {
+    fontFamily: FONTS.sans,
     color: COLORS.danger,
-    fontWeight: "600",
-    fontSize: 16,
+    fontWeight: '600',
+    fontSize: 15,
   },
   empty: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     gap: SPACING.md,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.bg,
   },
   emptyText: {
-    color: COLORS.textMuted,
+    fontFamily: FONTS.sans,
+    color: COLORS.muted,
     fontSize: 14,
   },
   secondaryButton: {
@@ -187,7 +196,8 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.surface,
   },
   secondaryText: {
-    color: COLORS.secondary,
-    fontWeight: "600",
+    fontFamily: FONTS.sans,
+    color: COLORS.ink,
+    fontWeight: '600',
   },
 });

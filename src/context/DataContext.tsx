@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext, useMemo, useState } from "react";
+import { createContext, ReactNode, useCallback, useContext, useMemo, useState } from "react";
 
 import { MOCK_IKAN, MOCK_KOLAM } from "../data/mockData";
 import { Ikan, Kolam } from "../types";
@@ -43,12 +43,15 @@ export function DataProvider({ children }: { children: ReactNode }) {
     ambilVarietasUnik(MOCK_IKAN),
   );
 
-  const catatVarietas = (nama: string): string => {
-    const sudahAda = riwayatVarietas.find((v) => samaVarietas(v, nama));
-    if (sudahAda) return sudahAda;
-    setRiwayatVarietas((prev) => [...prev, nama]);
-    return nama;
-  };
+  const catatVarietas = useCallback(
+    (nama: string): string => {
+      const sudahAda = riwayatVarietas.find((v) => samaVarietas(v, nama));
+      if (sudahAda) return sudahAda;
+      setRiwayatVarietas((prev) => [...prev, nama]);
+      return nama;
+    },
+    [riwayatVarietas]
+  );
 
   const value = useMemo<DataContextValue>(
     () => ({
@@ -83,7 +86,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
       deleteIkan: (id) =>
         setIkan((prev) => prev.filter((item) => item.id !== id)),
     }),
-    [kolam, ikan, riwayatVarietas],
+    [kolam, ikan, riwayatVarietas, catatVarietas],
   );
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;

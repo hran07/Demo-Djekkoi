@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import {
   KeyboardAvoidingView,
   Modal,
@@ -8,10 +8,11 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
-} from "react-native";
-
-import { COLORS, RADIUS, SPACING } from "../constants/theme";
+} from 'react-native';
+import Svg, { Path } from 'react-native-svg';
+import { COLORS, FONTS } from '../constants/theme';
 
 export interface SelectOption {
   label: string;
@@ -21,9 +22,10 @@ export interface SelectOption {
 export interface FormField {
   key: string;
   label: string;
-  type: "text" | "number" | "select";
+  type: 'text' | 'number' | 'select';
   placeholder?: string;
   options?: SelectOption[];
+  suggestions?: string[];
 }
 
 export type FormValues = Record<string, string>;
@@ -39,9 +41,22 @@ interface ModalFormProps {
 
 function buildEmptyValues(fields: FormField[]): FormValues {
   return fields.reduce<FormValues>((acc, field) => {
-    acc[field.key] = "";
+    acc[field.key] = field.type === 'select' && field.options?.length ? field.options[0].value : '';
     return acc;
   }, {});
+}
+
+function filterSuggestions(suggestions: string[], input: string): string[] {
+  const query = input.trim().toLowerCase();
+  const cocok = suggestions.filter((item) => {
+    const lower = item.toLowerCase();
+    return lower !== query && (query === '' || lower.includes(query));
+  });
+  return cocok.sort((a, b) => {
+    const aStarts = a.toLowerCase().startsWith(query) ? 0 : 1;
+    const bStarts = b.toLowerCase().startsWith(query) ? 0 : 1;
+    return aStarts - bStarts;
+  });
 }
 
 export default function ModalForm({
@@ -53,22 +68,59 @@ export default function ModalForm({
   onClose,
 }: ModalFormProps) {
   const [values, setValues] = useState<FormValues>(buildEmptyValues(fields));
+  const [focusedKey, setFocusedKey] = useState<string | null>(null);
 
   useEffect(() => {
     if (visible) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setValues({ ...buildEmptyValues(fields), ...initialValues });
+    } else {
+      setFocusedKey(null);
     }
   }, [visible, fields, initialValues]);
 
-  const setValue = (key: string, value: string) => {
-    setValues((prev) => ({ ...prev, [key]: value }));
+  const setValue = (key: string, val: string) => {
+    setValues((prev) => ({ ...prev, [key]: val }));
   };
 
-  const isValid = fields.every((field) => values[field.key]?.trim() !== "");
-
   const handleSubmit = () => {
-    if (!isValid) return;
+    const adaKosong = fields.some((f) => !values[f.key] || values[f.key].trim() === '');
+    if (adaKosong) {
+      return;
+    }
     onSubmit(values);
+  };
+
+  const renderSuggestions = (field: FormField) => {
+    if (field.type !== 'text' || !field.suggestions) return null;
+
+    const value = values[field.key] ?? '';
+    const aktif = focusedKey === field.key || value.trim() !== '';
+    if (!aktif) return null;
+
+    const daftar = filterSuggestions(field.suggestions, value);
+    if (daftar.length === 0) return null;
+
+    return (
+      <View style={styles.suggestionWrapper}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={styles.suggestionRow}
+        >
+          {daftar.map((item) => (
+            <TouchableOpacity
+              key={item}
+              style={styles.suggestionChip}
+              onPress={() => setValue(field.key, item)}
+            >
+              <Text style={styles.suggestionText}>{item}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
+    );
   };
 
   return (
@@ -80,86 +132,109 @@ export default function ModalForm({
     >
       <KeyboardAvoidingView
         style={styles.overlay}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
+        <Pressable style={styles.backdrop} onPress={onClose} />
+
         <View style={styles.sheet}>
-          <Text style={styles.title}>{title}</Text>
+          {/* Grabber Bar */}
+          <View style={styles.grabber} />
+
+          {/* Header Title & Close Button */}
+          <View style={styles.header}>
+            <Text style={styles.title}>{title}</Text>
+            <TouchableOpacity
+              style={styles.closeBtn}
+              onPress={onClose}
+              accessibilityRole="button"
+              accessibilityLabel="Tutup"
+            >
+              <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
+                <Path
+                  d="M6 6l12 12M18 6L6 18"
+                  stroke={COLORS.muted}
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </Svg>
+            </TouchableOpacity>
+          </View>
 
           <ScrollView
-            contentContainerStyle={styles.form}
+            style={styles.body}
+            contentContainerStyle={styles.bodyContent}
             keyboardShouldPersistTaps="handled"
           >
             {fields.map((field) => (
               <View key={field.key} style={styles.fieldGroup}>
                 <Text style={styles.label}>{field.label}</Text>
 
-                {field.type === "select" ? (
+                {field.type === 'select' ? (
                   <View style={styles.optionRow}>
-                    {field.options?.map((option) => {
-                      const selected = values[field.key] === option.value;
+                    {field.options?.map((opt) => {
+                      const selected = values[field.key] === opt.value;
                       return (
-                        <Pressable
-                          key={option.value}
+                        <TouchableOpacity
+                          key={opt.value}
                           style={[
-                            styles.option,
-                            selected && styles.optionSelected,
+                            styles.optionChip,
+                            selected ? styles.optionChipSelected : styles.optionChipUnselected,
                           ]}
-                          onPress={() => setValue(field.key, option.value)}
+                          onPress={() => setValue(field.key, opt.value)}
                         >
                           <Text
                             style={[
                               styles.optionText,
-                              selected && styles.optionTextSelected,
+                              selected ? styles.optionTextSelected : styles.optionTextUnselected,
                             ]}
                           >
-                            {option.label}
+                            {opt.label}
                           </Text>
-                        </Pressable>
+                        </TouchableOpacity>
                       );
                     })}
                   </View>
                 ) : (
                   <TextInput
-                    style={styles.input}
+                    style={[
+                      styles.input,
+                      focusedKey === field.key && styles.inputFocused,
+                    ]}
                     value={values[field.key]}
                     onChangeText={(text) =>
                       setValue(
                         field.key,
-                        field.type === "number"
-                          ? text.replace(/[^0-9.]/g, "")
-                          : text,
+                        field.type === 'number' ? text.replace(/[^0-9]/g, '') : text
                       )
                     }
+                    onFocus={() => setFocusedKey(field.key)}
+                    onBlur={() => setFocusedKey((prev) => (prev === field.key ? null : prev))}
                     placeholder={field.placeholder}
-                    placeholderTextColor={COLORS.textMuted}
-                    keyboardType={
-                      field.type === "number" ? "numeric" : "default"
-                    }
+                    placeholderTextColor={COLORS.muted}
+                    keyboardType={field.type === 'number' ? 'numeric' : 'default'}
+                    autoCapitalize={field.suggestions ? 'words' : undefined}
                   />
                 )}
+
+                {renderSuggestions(field)}
               </View>
             ))}
           </ScrollView>
 
-          <View style={styles.footer}>
-            <Pressable
-              style={[styles.button, styles.cancelButton]}
-              onPress={onClose}
-            >
-              <Text style={styles.cancelText}>Batal</Text>
-            </Pressable>
-            <Pressable
-              style={[
-                styles.button,
-                styles.submitButton,
-                !isValid && styles.submitDisabled,
-              ]}
-              onPress={handleSubmit}
-              disabled={!isValid}
-            >
-              <Text style={styles.submitText}>Simpan</Text>
-            </Pressable>
-          </View>
+          {/* Submit Button */}
+          <TouchableOpacity
+            style={styles.submitBtn}
+            onPress={handleSubmit}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.submitBtnText}>Simpan</Text>
+          </TouchableOpacity>
+
+          {/* Batal Button */}
+          <TouchableOpacity style={styles.cancelBtn} onPress={onClose}>
+            <Text style={styles.cancelBtnText}>Batal</Text>
+          </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
     </Modal>
@@ -169,95 +244,156 @@ export default function ModalForm({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    justifyContent: "flex-end",
-    backgroundColor: "rgba(15, 23, 42, 0.5)",
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(11, 43, 51, 0.5)',
+  },
+  backdrop: {
+    ...StyleSheet.absoluteFill,
   },
   sheet: {
-    maxHeight: "85%",
     backgroundColor: COLORS.surface,
-    borderTopLeftRadius: RADIUS.modal,
-    borderTopRightRadius: RADIUS.modal,
-    padding: SPACING.lg,
-    gap: SPACING.md,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: Platform.OS === 'ios' ? 36 : 24,
+    maxHeight: '90%',
+    shadowColor: COLORS.headerDark,
+    shadowOffset: { width: 0, height: -8 },
+    shadowOpacity: 0.18,
+    shadowRadius: 30,
+    elevation: 16,
+  },
+  grabber: {
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#C9D6D8',
+    alignSelf: 'center',
+    marginBottom: 16,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
   },
   title: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: COLORS.secondary,
+    fontFamily: FONTS.serif,
+    fontSize: 24,
+    fontWeight: '700',
+    color: COLORS.ink,
   },
-  form: {
-    gap: SPACING.gap,
+  closeBtn: {
+    width: 44,
+    height: 44,
+    marginRight: -10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  body: {
+    maxHeight: 380,
+  },
+  bodyContent: {
+    gap: 14,
+    paddingBottom: 10,
   },
   fieldGroup: {
-    gap: SPACING.xs,
+    gap: 6,
   },
   label: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: COLORS.secondary,
+    fontFamily: FONTS.sans,
+    fontSize: 13,
+    fontWeight: '600',
+    color: COLORS.muted,
   },
   input: {
-    borderWidth: 1,
+    height: 50,
+    borderWidth: 1.5,
     borderColor: COLORS.border,
-    borderRadius: RADIUS.card,
-    paddingHorizontal: SPACING.sm + 4,
-    paddingVertical: SPACING.sm + 4,
-    fontSize: 16,
-    color: COLORS.secondary,
-    backgroundColor: COLORS.background,
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    fontFamily: FONTS.sans,
+    fontSize: 15,
+    color: COLORS.ink,
+    backgroundColor: COLORS.surface,
+  },
+  inputFocused: {
+    borderColor: COLORS.accent,
   },
   optionRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: SPACING.sm,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
   },
-  option: {
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.sm,
-    borderRadius: RADIUS.card,
+  optionChip: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: COLORS.border,
-    backgroundColor: COLORS.background,
   },
-  optionSelected: {
-    backgroundColor: COLORS.primary,
-    borderColor: COLORS.primary,
+  optionChipSelected: {
+    backgroundColor: COLORS.headerDark,
+    borderColor: COLORS.headerDark,
+  },
+  optionChipUnselected: {
+    backgroundColor: COLORS.surface,
+    borderColor: COLORS.border,
   },
   optionText: {
-    fontSize: 14,
-    color: COLORS.secondary,
+    fontFamily: FONTS.sans,
+    fontSize: 13,
   },
   optionTextSelected: {
-    color: COLORS.surface,
-    fontWeight: "600",
+    color: '#FFFFFF',
+    fontWeight: '600',
   },
-  footer: {
-    flexDirection: "row",
-    gap: SPACING.gap,
+  optionTextUnselected: {
+    color: COLORS.ink,
+    fontWeight: '500',
   },
-  button: {
-    flex: 1,
-    alignItems: "center",
-    paddingVertical: SPACING.sm + 4,
-    borderRadius: RADIUS.card,
+  suggestionWrapper: {
+    marginTop: 4,
   },
-  cancelButton: {
-    backgroundColor: COLORS.background,
-    borderWidth: 1,
-    borderColor: COLORS.border,
+  suggestionRow: {
+    gap: 8,
   },
-  cancelText: {
-    color: COLORS.secondary,
-    fontWeight: "600",
+  suggestionChip: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 999,
+    backgroundColor: COLORS.accentSoft,
   },
-  submitButton: {
-    backgroundColor: COLORS.primary,
+  suggestionText: {
+    fontFamily: FONTS.sans,
+    fontSize: 12,
+    color: COLORS.accent,
+    fontWeight: '600',
   },
-  submitDisabled: {
-    opacity: 0.5,
+  submitBtn: {
+    height: 52,
+    borderRadius: 14,
+    backgroundColor: COLORS.accent,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 16,
   },
-  submitText: {
-    color: COLORS.surface,
-    fontWeight: "600",
+  submitBtnText: {
+    fontFamily: FONTS.sans,
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  cancelBtn: {
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 4,
+  },
+  cancelBtnText: {
+    fontFamily: FONTS.sans,
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.muted,
   },
 });

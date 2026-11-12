@@ -1,128 +1,182 @@
-import { Ionicons } from "@expo/vector-icons";
-import { Pressable, StyleSheet, Text, View } from "react-native";
-
-import {
-  COLORS,
-  RADIUS,
-  SPACING,
-  STATUS_KOLAM_COLOR,
-} from "../constants/theme";
-import { Kolam } from "../types";
+import React from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Svg, { Path } from 'react-native-svg';
+import { COLORS, FONTS, STATUS_KOLAM_STYLE } from '../constants/theme';
+import { Kolam } from '../types';
 
 interface CardKolamProps {
   kolam: Kolam;
+  ikanCount?: number;
   onEdit: (kolam: Kolam) => void;
   onDelete: (id: string) => void;
-  onPress?: (item: Kolam) => void;
+  onPress?: (kolam: Kolam) => void;
 }
 
 export default function CardKolam({
   kolam,
+  ikanCount = 0,
   onEdit,
   onDelete,
   onPress,
 }: CardKolamProps) {
-  const statusColor = STATUS_KOLAM_COLOR[kolam.status];
+  const badgeStyle = STATUS_KOLAM_STYLE[kolam.status] || STATUS_KOLAM_STYLE.Aktif;
 
   return (
-    <Pressable style={styles.card} onPress={() => onPress?.(kolam)}>
-      <View style={styles.header}>
-        <Text style={styles.nama}>{kolam.nama}</Text>
-        <View style={[styles.badge, { backgroundColor: statusColor }]}>
-          <Text style={styles.badgeText}>{kolam.status}</Text>
+    <TouchableOpacity
+      style={styles.card}
+      onPress={() => onPress?.(kolam)}
+      activeOpacity={0.75}
+      accessibilityRole="button"
+      accessibilityLabel={`Kolam ${kolam.nama}, status ${kolam.status}`}
+    >
+      {/* Baris Atas: Nama Kolam, Jenis, dan Badge Status */}
+      <View style={styles.topRow}>
+        <View style={styles.titleWrap}>
+          <Text style={styles.nama}>{kolam.nama}</Text>
+          <Text style={styles.jenis}>Kolam {kolam.jenis.toLowerCase()}</Text>
+        </View>
+
+        <View style={[styles.badge, { backgroundColor: badgeStyle.bg }]}>
+          <Text style={[styles.badgeText, { color: badgeStyle.text }]}>
+            {kolam.status}
+          </Text>
         </View>
       </View>
 
-      <View style={styles.info}>
-        <Text style={styles.label}>Jenis</Text>
-        <Text style={styles.value}>{kolam.jenis}</Text>
-      </View>
-      <View style={styles.info}>
-        <Text style={styles.label}>Kapasitas</Text>
-        <Text style={styles.value}>
-          {kolam.kapasitas.toLocaleString("id-ID")}
-        </Text>
-      </View>
+      {/* Baris Bawah: Info Ikan, Kapasitas, & Tombol Aksi */}
+      <View style={styles.bottomRow}>
+        <View style={styles.statsWrap}>
+          <Text style={styles.statItem}>
+            <Text style={styles.statLabel}>Ikan </Text>
+            <Text style={styles.statValue}>{ikanCount} ekor</Text>
+          </Text>
+          <Text style={styles.statItem}>
+            <Text style={styles.statLabel}>Kapasitas </Text>
+            <Text style={styles.statValue}>{kolam.kapasitas.toLocaleString('id-ID')} L</Text>
+          </Text>
+        </View>
 
-      <View style={styles.actions}>
-        <Pressable style={styles.actionButton} onPress={() => onEdit(kolam)}>
-          <Ionicons name="create-outline" size={20} color={COLORS.primary} />
-          <Text style={[styles.actionText, { color: COLORS.primary }]}>
-            Edit
-          </Text>
-        </Pressable>
-        <Pressable
-          style={styles.actionButton}
-          onPress={() => onDelete(kolam.id)}
-        >
-          <Ionicons name="trash-outline" size={20} color={COLORS.danger} />
-          <Text style={[styles.actionText, { color: COLORS.danger }]}>
-            Hapus
-          </Text>
-        </Pressable>
+        <View style={styles.actionsWrap}>
+          {/* Tombol Edit */}
+          <TouchableOpacity
+            style={styles.iconBtn}
+            onPress={(e) => {
+              e.stopPropagation?.();
+              onEdit(kolam);
+            }}
+            accessibilityRole="button"
+            accessibilityLabel={`Edit ${kolam.nama}`}
+          >
+            <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
+              <Path
+                d="M4 20h4L19 9l-4-4L4 16z"
+                stroke={COLORS.accent}
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </Svg>
+          </TouchableOpacity>
+
+          {/* Tombol Hapus */}
+          <TouchableOpacity
+            style={styles.iconBtn}
+            onPress={(e) => {
+              e.stopPropagation?.();
+              onDelete(kolam.id);
+            }}
+            accessibilityRole="button"
+            accessibilityLabel={`Hapus ${kolam.nama}`}
+          >
+            <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
+              <Path
+                d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"
+                stroke={COLORS.danger}
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </Svg>
+          </TouchableOpacity>
+        </View>
       </View>
-    </Pressable>
+    </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
     backgroundColor: COLORS.surface,
-    borderRadius: RADIUS.card,
-    padding: SPACING.md,
-    gap: SPACING.sm,
     borderWidth: 1,
     borderColor: COLORS.border,
+    borderRadius: 16,
+    paddingTop: 14,
+    paddingLeft: 16,
+    paddingRight: 8,
+    paddingBottom: 10,
   },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+  topRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    paddingRight: 8,
+  },
+  titleWrap: {
+    flex: 1,
   },
   nama: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: COLORS.secondary,
+    fontFamily: FONTS.sans,
+    fontSize: 16,
+    fontWeight: '700',
+    color: COLORS.ink,
+  },
+  jenis: {
+    fontFamily: FONTS.sans,
+    fontSize: 12,
+    color: COLORS.muted,
+    marginTop: 2,
   },
   badge: {
-    paddingHorizontal: SPACING.sm + 4,
-    paddingVertical: SPACING.xs,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
     borderRadius: 999,
   },
   badgeText: {
-    color: COLORS.surface,
-    fontSize: 12,
-    fontWeight: "600",
+    fontFamily: FONTS.sans,
+    fontSize: 11,
+    fontWeight: '600',
   },
-  info: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+  bottomRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 6,
   },
-  label: {
-    color: COLORS.textMuted,
-    fontSize: 14,
+  statsWrap: {
+    flex: 1,
+    flexDirection: 'row',
+    gap: 20,
+    alignItems: 'center',
   },
-  value: {
-    color: COLORS.secondary,
-    fontSize: 14,
-    fontWeight: "500",
+  statItem: {
+    fontFamily: FONTS.sans,
+    fontSize: 13,
   },
-  actions: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    gap: SPACING.md,
-    marginTop: SPACING.sm,
-    paddingTop: SPACING.sm + 4,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.border,
+  statLabel: {
+    color: COLORS.muted,
   },
-  actionButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: SPACING.xs,
+  statValue: {
+    fontWeight: '600',
+    color: COLORS.ink,
   },
-  actionText: {
-    fontSize: 14,
-    fontWeight: "600",
+  actionsWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  iconBtn: {
+    width: 44,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

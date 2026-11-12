@@ -1,6 +1,6 @@
-import { StyleSheet, Text, View } from "react-native";
-
-import { COLORS, SPACING } from "../constants/theme";
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import { COLORS, FONTS, SPACING } from '../constants/theme';
 
 interface InfoRowProps {
   label: string;
@@ -18,17 +18,21 @@ export default function InfoRow({ label, value }: InfoRowProps) {
 
 const styles = StyleSheet.create({
   row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     paddingVertical: SPACING.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.borderLight,
   },
   label: {
-    color: COLORS.textMuted,
+    fontFamily: FONTS.sans,
+    color: COLORS.muted,
     fontSize: 14,
   },
   value: {
-    color: COLORS.secondary,
+    fontFamily: FONTS.sans,
+    color: COLORS.ink,
     fontSize: 14,
-    fontWeight: "500",
+    fontWeight: '600',
   },
 });
